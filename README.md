@@ -34,21 +34,41 @@ cvlc --random --loop ~/aws_tutorial_video.mp4 :sout=#gather:rtp{sdp=rtsp://:8554
 ## Make it as a service daemon
 
 ```sh
-vim ~/produce_video_stream.sh
+sudo mkdir -p sudo mkdir -p /share/video_stream
+sudo cp ~/aws_tutorial_video.mp4  /share/video_stream/
+```
+
+
+```sh
+sudo vim /share/video_stream/produce_video_stream.sh
 
 ```
 
 ```vim
 #!/bin/bash
 
-cvlc --random --loop ~/aws_tutorial_video.mp4 :sout=#gather:rtp{sdp=rtsp://:8554/} :network-caching=1500 :sout-all :sout-keep 
+#cvlc --random --loop /share/video_stream/aws_tutorial_video.mp4 :sout=\#gather:rtp{sdp=rtsp://:8554/} :network-caching=1500 :sout-all :sout-keep
+
+while true
+do
+  cvlc --random --loop /share/video_stream/aws_tutorial_video.mp4 :sout=\#gather:rtp{sdp=rtsp://:8554/} :network-caching=1500 :sout-all :sout-keep
+done
 
 ```
+
+#cvlc --daemon --random --loop /share/video_stream/aws_tutorial_video.mp4 :sout=\#gather:rtp{sdp=rtsp://:8554/} :network-caching=1500 :sout-all :sout-keep
 
 
 ```sh
-sudo vim /etc/systemd/system/video_stream_producer.service
+sudo chmod 755 -R /share
+
 ```
+
+```sh
+sudo vim /etc/systemd/system/video_stream_producer.service
+
+```
+
 
 ```vim
 [Unit]
@@ -56,17 +76,27 @@ Description=Test Video Stream Producer Daemon
 
 [Service]
 Type=simple
-ExecStart=/home/ec2-user/produce_video_stream.sh
+PIDFile=/run/video_stream_producer.pid
+
+ExecStart=/bin/bash /share/video_stream/produce_video_stream.sh
+
+User=ec2-user
+Group=ec2-user
+
 Restart=on-failure
+RestartSec=10
+
 
 [Install]
 WantedBy=multi-user.target
 
 ```
 
+
 ```sh
-sudo systemctl enable video_stream_producer
-sudo systemctl start video_stream_producer
+sudo systemctl daemon-reload && \
+sudo systemctl enable video_stream_producer && \
+sudo systemctl restart restart video_stream_producer && \
 sudo systemctl status video_stream_producer
 
 ```

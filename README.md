@@ -1,21 +1,31 @@
 # video-stream
 
+## Set up
+
 ```sh
-#subscription-manager repos --enable "rhel-*-optional-rpms" --enable "rhel-*-extras-rpms" # Only needed for RHEL
-sudo yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm -y
-sudo yum install https://download1.rpmfusion.org/free/el/rpmfusion-free-release-7.noarch.rpm -y
+sudo dnf update -y
+sudo dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+sudo dnf install -y https://download1.rpmfusion.org/free/el/rpmfusion-free-release-8.noarch.rpm
+sudo dnf install -y vlc
 
+sudo dnf install -y unzip
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
 
-sudo rpm --import http://li.nux.ro/download/nux/RPM-GPG-KEY-nux.ro
-sudo rpm -Uvh http://li.nux.ro/download/nux/dextop/el7/x86_64/nux-dextop-release-0-1.el7.nux.noarch.rpm
-sudo yum -y install ffmpeg ffmpeg-devel
+aws s3 cp s3://yjkim-dataset/video/aws_tutorial_video.mp4 ./
 
-
-
-
-sudo yum install vlc -y
-sudo yum install vlc-core -y   #(for minimal headless/server install)
-sudo yum install python-vlc npapi-vlc -y #(optionals)
 
 ```
 
+## Launch
+
+```sh
+#cvlc --random --loop /var/www/html/files/test.xspf :sout=#gather:rtp{sdp=rtsp://:8554/} :network-caching=1500 :sout-all :sout-keep
+#vlc -vvv ./Desktop/VideoprototypFinal.wmv --sout '#standard{access=udp, mux=ogg, dst=0.0.0.0:1234}'
+
+cvlc --random --loop ~/aws_tutorial_video.mp4 :sout=#gather:rtp{sdp=rtsp://:8554/} :network-caching=1500 :sout-all :sout-keep
+vlc -vvv ~/aws_tutorial_video.mp4 --sout '#standard{access=udp, mux=ogg, dst=0.0.0.0:1234}'
+
+
+```

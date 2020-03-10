@@ -8,6 +8,12 @@ sudo dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.
 sudo dnf install -y https://download1.rpmfusion.org/free/el/rpmfusion-free-release-8.noarch.rpm
 sudo dnf install -y vlc
 
+sudo amixer cset numid=3 1
+sudo alsactl store 0
+-A alsa,none --alsa-audio-device
+
+
+
 sudo dnf install -y unzip vim
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 unzip awscliv2.zip
